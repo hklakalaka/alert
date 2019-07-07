@@ -1,0 +1,36 @@
+function myFunction() {  
+  var query = 'subject:(*SBPS障害検知のご連絡)';
+  var threads = GmailApp.search(query);
+  var messages = GmailApp.getMessagesForThreads(threads);
+  
+  for(var i=0; i < messages.length; i++) {
+    for(var j=0; j < messages[i].length; j++) {
+      var id = messages[i][j].getId();
+      if(!hasId(id)){
+        var body = messages[i][j].getPlainBody();
+        sheet.appendRow([
+          fetchData(body, 'LB流量制限閾値', '%'),
+          fetchData(body, '障害対応', '３'),
+          fetchData(body, '通報者', '様'),
+          id
+        ]);              
+      }
+    }
+  }
+}
+ 
+function hasId(id) {
+  var hasId = data.some(function(array, i, data) {
+    return (array[0] === id);
+  });
+  return hasId;
+}
+ 
+function fetchData(str, pre, suf) {
+  var reg = new RegExp(pre + '.*?' + suf);
+  var data = '';
+    data = str.match(reg)[0]
+      .replace(pre, '')
+      .replace(suf, '');
+  return data;  
+}
